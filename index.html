@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: pink;
+    }
+    h1 {
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px;
+      cursor: pointer;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .task {
+      display: flex;
+      justify-content: space-between;
+      background-color: #ffffff;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .completed {
+      text-decoration: line-through;
+      color: grey;
+    }
+  </style>
+</head>
+<body>
+  <h1>To-Do List App</h1>
+  <input type="text" id="taskInput" placeholder="Add a new task" />
+  <button onclick="addTask()">Add Task</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    async function fetchTasks() {
+      const response = await fetch('/tasks');
+      const tasks = await response.json();
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task';
+        li.innerHTML = `
+          <span class="${task.completed ? 'completed' : ''}">${task.task}</span>
+          <button onclick="markCompleted(${task.id})">Complete</button>
+          <button onclick="deleteTask(${task.id})">Delete</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const taskInput = document.getElementById('taskInput').value;
+      if (taskInput) {
+        await fetch('/tasks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ task: taskInput }),
+        });
+        document.getElementById('taskInput').value = '';
+        fetchTasks();
+      }
+    }
+
+    async function markCompleted(id) {
+      await fetch(`/tasks/${id}`, {
+        method: 'PUT',
+      });
+      fetchTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(`/tasks/${id}`, {
+        method: 'DELETE',
+      });
+      fetchTasks();
+    }
+
+    // Load tasks when the page loads
+    fetchTasks();
+  </script>
+</body>
+</html>
