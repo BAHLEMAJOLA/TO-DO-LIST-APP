@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List App</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #f0f4f8;
+      background: linear-gradient(to right, #007BFF, #6a11cb);
       color: #333;
       display: flex;
       flex-direction: column;
@@ -17,8 +18,9 @@
       padding: 20px;
     }
     h1 {
-      color: #007BFF;
+      color: #fff;
       font-weight: 600;
+      margin-bottom: 20px;
     }
     .container {
       background-color: #fff;
@@ -27,6 +29,7 @@
       padding: 20px;
       width: 100%;
       max-width: 600px;
+      margin-bottom: 20px;
     }
     input[type="text"] {
       width: 75%;
@@ -55,11 +58,17 @@
     .task {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       background-color: #f9f9f9;
       padding: 10px;
       border-radius: 6px;
       margin-bottom: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .completed {
       text-decoration: line-through;
@@ -70,10 +79,29 @@
       padding-right: 10px;
     }
     .task button {
-      background-color: #ff4d4d;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
     .task button.complete {
-      background-color: #28a745;
+      color: #28a745;
+    }
+    .task button.delete {
+      color: #ff4d4d;
+    }
+    .completed-tasks {
+      background-color: #e9f6ec;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+    .completed-tasks h2 {
+      color: #28a745;
+      font-size: 18px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -81,8 +109,13 @@
   <h1>My To-Do List</h1>
   <div class="container">
     <input type="text" id="taskInput" placeholder="Add a new task" />
-    <button onclick="addTask()">Add Task</button>
+    <button onclick="addTask()"><i class="fas fa-plus"></i> Add Task</button>
     <ul id="taskList"></ul>
+  </div>
+
+  <div class="completed-tasks">
+    <h2>Completed Tasks</h2>
+    <ul id="completedTaskList"></ul>
   </div>
 
   <script>
@@ -90,16 +123,23 @@
       const response = await fetch('/tasks');
       const tasks = await response.json();
       const taskList = document.getElementById('taskList');
+      const completedTaskList = document.getElementById('completedTaskList');
       taskList.innerHTML = '';
+      completedTaskList.innerHTML = '';
+
       tasks.forEach(task => {
         const li = document.createElement('li');
         li.className = 'task';
         li.innerHTML = `
           <span class="${task.completed ? 'completed' : ''}">${task.task}</span>
-          <button class="complete" onclick="markCompleted(${task.id})">Complete</button>
-          <button onclick="deleteTask(${task.id})">Delete</button>
+          <button class="complete" onclick="markCompleted(${task.id})"><i class="fas fa-check-circle"></i></button>
+          <button class="delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
         `;
-        taskList.appendChild(li);
+        if (task.completed) {
+          completedTaskList.appendChild(li);
+        } else {
+          taskList.appendChild(li);
+        }
       });
     }
 
@@ -136,4 +176,3 @@
   </script>
 </body>
 </html>
-
