@@ -58,3 +58,18 @@ app.delete('/tasks/:id', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// Route to edit a task name
+app.patch('/tasks/:id', (req, res) => {
+  const taskId = parseInt(req.params.id);
+  const { task } = req.body;
+  const taskToUpdate = tasks.find(t => t.id === taskId);
+  
+  if (taskToUpdate && task) {
+    taskToUpdate.task = task;  // Update the task name
+    res.json(taskToUpdate);
+  } else {
+    res.status(400).json({ error: 'Task not found or invalid task content' });
+  }
+});
+

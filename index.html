@@ -89,6 +89,9 @@
     .task button.delete {
       color: #ff4d4d;
     }
+    .task button.edit {
+      color: #ffc107;
+    }
     .completed-tasks {
       background-color: #e9f6ec;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -134,6 +137,7 @@
           <span class="${task.completed ? 'completed' : ''}">${task.task}</span>
           <button class="complete" onclick="markCompleted(${task.id})"><i class="fas fa-check-circle"></i></button>
           <button class="delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
+          <button class="edit" onclick="editTask(${task.id}, '${task.task}')"><i class="fas fa-edit"></i></button>
         `;
         if (task.completed) {
           completedTaskList.appendChild(li);
@@ -170,6 +174,20 @@
         method: 'DELETE',
       });
       fetchTasks();
+    }
+
+    async function editTask(id, currentTask) {
+      const newTask = prompt("Edit the task:", currentTask);
+      if (newTask && newTask !== currentTask) {
+        await fetch(`/tasks/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ task: newTask }),
+        });
+        fetchTasks();
+      }
     }
 
     fetchTasks();
