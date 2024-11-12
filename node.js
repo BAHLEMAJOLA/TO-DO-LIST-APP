@@ -1,5 +1,6 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+
 const app = express();
 const PORT = 3000;
 
@@ -7,14 +8,14 @@ const PORT = 3000;
 app.use(express.json());
 
 // Serve the frontend (static files)
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(process.cwd())));
 
 // In-memory storage for tasks
 let tasks = [];
 
 // Route to serve the main HTML page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 // Route to get all tasks
@@ -57,9 +58,3 @@ app.delete('/tasks/:id', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-
-
-
-
-  
