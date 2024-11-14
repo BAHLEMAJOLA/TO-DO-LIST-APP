@@ -1,5 +1,6 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+
 const app = express();
 const PORT = 3000;
 
@@ -7,14 +8,14 @@ const PORT = 3000;
 app.use(express.json());
 
 // Serve the frontend (static files)
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(process.cwd())));
 
 // In-memory storage for tasks
 let tasks = [];
 
 // Route to serve the main HTML page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 // Route to get all tasks
@@ -58,7 +59,17 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-
-
-
+// Route to edit a task name
+app.patch('/tasks/:id', (req, res) => {
+  const taskId = parseInt(req.params.id);
+  const { task } = req.body;
+  const taskToUpdate = tasks.find(t => t.id === taskId);
+  
+  if (taskToUpdate && task) {
+    taskToUpdate.task = task;  // Update the task name
+    res.json(taskToUpdate);
+  } else {
+    res.status(400).json({ error: 'Task not found or invalid task content' });
+  }
+});
 
